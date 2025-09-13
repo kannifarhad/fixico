@@ -1,0 +1,124 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Fixico API",
+        "description": "API documentation for Fixico Technical Assignment",
+        "contact": {
+            "email": "kanniferhad@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/flags": {
+            "get": {
+                "tags": [
+                    "Feature Flags"
+                ],
+                "summary": "Get all feature flags",
+                "operationId": "9e46b2fc7f98b766c4ee38cd371a2d32",
+                "responses": {
+                    "200": {
+                        "description": "List of feature flags",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FeatureFlag"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/flags/{key}": {
+            "get": {
+                "tags": [
+                    "Feature Flags"
+                ],
+                "summary": "Get a single feature flag",
+                "operationId": "fdb857ea297c3a6b20554255c7b0f763",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Feature flag key",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "allow_delete_reports"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Feature flag data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeatureFlag"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "FeatureFlag": {
+                "title": "FeatureFlag",
+                "required": [
+                    "id",
+                    "key",
+                    "name",
+                    "enabled"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "key": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Feature Flags",
+            "description": "Feature Flags"
+        }
+    ]
+}
