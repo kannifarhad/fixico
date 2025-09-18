@@ -1,11 +1,12 @@
 <?php
 
-namespace App\FeatureFlags\Api;
+namespace App\FeatureFlags\Controllers;
 
 use App\Config\APIController;
 use App\FeatureFlags\Services\FeatureFlagService;
+use Illuminate\Http\Request;
 
-class FeatureFlagController extends APIController
+class FeatureFlagApiController extends APIController
 {
     protected FeatureFlagService $service;
 
@@ -18,6 +19,13 @@ class FeatureFlagController extends APIController
      *     path="/api/flags",
      *     tags={"Feature Flags"},
      *     summary="Get all feature flags",
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="query",
+     *         required=false,
+     *         description="Filter flags for a specific user",
+     *         @OA\Schema(type="integer", example=123)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of feature flags",
@@ -25,10 +33,10 @@ class FeatureFlagController extends APIController
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $flags = $this->service->getAll();
-        return response()->json($flags);
+        $userId = $request->query('userId') ?? crc32(request()->ip() ?? uniqid());
+        return $this->service->getAllEnabled($userId ? (int) $userId : null);
     }
 
     /**
@@ -44,6 +52,13 @@ class FeatureFlagController extends APIController
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="query",
+     *         required=false,
+     *         description="Filter flags for a specific user",
+     *         @OA\Schema(type="integer", example=123)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Feature flag data",
@@ -52,10 +67,11 @@ class FeatureFlagController extends APIController
      *     @OA\Response(response=404, description="Not found")
      * )
      */
-    public function show(string $key)
+    public function show(Request $request, string $key)
     {
-        $flag = $this->service->findByKey($key);
-
-        return response()->json($flag);
+        $userId = $request->query('userId') ?? crc32(request()->ip() ?? uniqid());
+        return response()->json([
+            'enabled' => $this->service->isEnabledByKey($key, $userId ? (int) $userId : null)
+        ]);
     }
 }

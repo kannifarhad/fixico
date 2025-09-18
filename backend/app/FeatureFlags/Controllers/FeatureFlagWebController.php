@@ -1,13 +1,13 @@
 <?php
 
-namespace App\FeatureFlags\Web;
+namespace App\FeatureFlags\Controllers;
 
 use App\Config\AppController;
 use App\FeatureFlags\Services\FeatureFlagService;
 use App\FeatureFlags\Models\FeatureFlag;
-use App\FeatureFlags\Web\FeatureFlagRequest;
+use App\FeatureFlags\Controllers\FeatureFlagWebRequest;
 
-class FeatureFlagController extends AppController
+class FeatureFlagWebController extends AppController
 {
     protected FeatureFlagService $service;
 
@@ -30,10 +30,16 @@ class FeatureFlagController extends AppController
     }
 
     // Store a new flag
-    public function store(FeatureFlagRequest $request)
+    public function store(FeatureFlagWebRequest $request)
     {
 
-        $this->service->create($request->validated());
+        $data = $request->validated();
+
+        // If "rules" comes as string from form → convert to array
+        if (is_string($data['rules'])) {
+            $data['rules'] = json_decode($data['rules'], true);
+        }
+        $this->service->create($data);
 
         return redirect()->route('featureFlags.index')
             ->with('success', 'Feature flag created!');
@@ -46,9 +52,19 @@ class FeatureFlagController extends AppController
     }
 
     // Update existing flag
-    public function update(FeatureFlagRequest $request, FeatureFlag $flag)
+    public function update(FeatureFlagWebRequest $request, FeatureFlag $flag)
     {
-        $this->service->update($flag, $request->validated());
+        $data = $request->validated();
+
+        // Normalize "enabled" to true/false (always present because of hidden input)
+        $data['enabled'] = $request->boolean('enabled');
+
+        // If "rules" comes as string from form → convert to array
+        if (is_string($data['rules'])) {
+            $data['rules'] = json_decode($data['rules'], true);
+        }
+
+        $this->service->update($flag, $data);
 
         return redirect()->route('featureFlags.index')
             ->with('success', 'Feature flag updated!');

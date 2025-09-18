@@ -1,17 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\FeatureFlags\Web\FeatureFlagController;
+use App\FeatureFlags\Controllers\FeatureFlagWebController;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::prefix('admin')->group(function () {
+    Route::get('/', [FeatureFlagWebController::class, 'index'])->name('featureFlags.index');
+    Route::get('/create', [FeatureFlagWebController::class, 'create'])->name('featureFlags.create');
+    Route::post('/', [FeatureFlagWebController::class, 'store'])->name('featureFlags.store');
+    Route::get('/{flag}/edit', [FeatureFlagWebController::class, 'edit'])->name('featureFlags.edit');
+    Route::put('/{flag}', [FeatureFlagWebController::class, 'update'])->name('featureFlags.update');
+    Route::delete('/{flag}', [FeatureFlagWebController::class, 'destroy'])->name('featureFlags.destroy');
 });
 
-Route::prefix('admin/flags')->group(function () {
-    Route::get('/', [FeatureFlagController::class, 'index'])->name('flags.index');
-    Route::get('/create', [FeatureFlagController::class, 'create'])->name('flags.create');
-    Route::post('/', [FeatureFlagController::class, 'store'])->name('flags.store');
-    Route::get('/{flag}/edit', [FeatureFlagController::class, 'edit'])->name('flags.edit');
-    Route::put('/{flag}', [FeatureFlagController::class, 'update'])->name('flags.update');
-    Route::delete('/{flag}', [FeatureFlagController::class, 'destroy'])->name('flags.destroy');
+Route::fallback(function () {
+    abort(404);
 });

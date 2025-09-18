@@ -9,13 +9,185 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/carReports": {
+            "get": {
+                "tags": [
+                    "CarDamageReports"
+                ],
+                "summary": "Get all car damage reports",
+                "operationId": "e30bffc57c1cf6b658680937bbb3ce3e",
+                "responses": {
+                    "200": {
+                        "description": "List of car damage reports",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CarDamageReports"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CarDamageReports"
+                ],
+                "summary": "Create a new car damage report",
+                "operationId": "c50c88697d3765a3410df1b4485d7bc5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarDamageReportsInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Report created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CarDamageReports"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/carReports/{id}": {
+            "get": {
+                "tags": [
+                    "CarDamageReports"
+                ],
+                "summary": "Get a single car damage report",
+                "operationId": "df6a7d8c1e977762ad8e9a5e5fd6aba6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Car damage report details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CarDamageReports"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Report not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CarDamageReports"
+                ],
+                "summary": "Update an existing car damage report",
+                "operationId": "1d6dc5077c631f0459723089a1d557b9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarDamageReportsInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Report updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CarDamageReports"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Report not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CarDamageReports"
+                ],
+                "summary": "Delete a car damage report",
+                "operationId": "b5a58b30e3585798da7a2894a490e72d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Report deleted"
+                    },
+                    "404": {
+                        "description": "Report not found"
+                    }
+                }
+            }
+        },
         "/api/flags": {
             "get": {
                 "tags": [
                     "Feature Flags"
                 ],
                 "summary": "Get all feature flags",
-                "operationId": "9e46b2fc7f98b766c4ee38cd371a2d32",
+                "operationId": "cbd126802c5243a6b02ef38b92310048",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "Filter flags for a specific user",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 123
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of feature flags",
@@ -39,7 +211,7 @@
                     "Feature Flags"
                 ],
                 "summary": "Get a single feature flag",
-                "operationId": "fdb857ea297c3a6b20554255c7b0f763",
+                "operationId": "1b655c8dd7b8dbfae3d7ab706f3b578b",
                 "parameters": [
                     {
                         "name": "key",
@@ -50,6 +222,16 @@
                             "type": "string"
                         },
                         "example": "allow_delete_reports"
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "description": "Filter flags for a specific user",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 123
+                        }
                     }
                 ],
                 "responses": {
@@ -72,6 +254,104 @@
     },
     "components": {
         "schemas": {
+            "CarDamageReportsInput": {
+                "title": "Car Damage Report Input",
+                "required": [
+                    "reporter_name",
+                    "car_model",
+                    "license_plate",
+                    "description",
+                    "damage_level"
+                ],
+                "properties": {
+                    "reporter_name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "car_model": {
+                        "type": "string",
+                        "example": "Toyota Corolla"
+                    },
+                    "license_plate": {
+                        "type": "string",
+                        "example": "ABC-1234"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Front bumper dented"
+                    },
+                    "damage_level": {
+                        "type": "string",
+                        "enum": [
+                            "minor",
+                            "moderate",
+                            "severe"
+                        ],
+                        "example": "moderate"
+                    },
+                    "is_resolved": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "CarDamageReports": {
+                "title": "Car Damage Report",
+                "required": [
+                    "reporter_name",
+                    "car_model",
+                    "license_plate",
+                    "description",
+                    "damage_level"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "reporter_name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "car_model": {
+                        "type": "string",
+                        "example": "Toyota Corolla"
+                    },
+                    "license_plate": {
+                        "type": "string",
+                        "example": "ABC-1234"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Front bumper dented"
+                    },
+                    "damage_level": {
+                        "type": "string",
+                        "enum": [
+                            "minor",
+                            "moderate",
+                            "severe"
+                        ],
+                        "example": "moderate"
+                    },
+                    "is_resolved": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-13T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-13T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            },
             "FeatureFlag": {
                 "title": "FeatureFlag",
                 "required": [
@@ -116,6 +396,10 @@
         }
     },
     "tags": [
+        {
+            "name": "CarDamageReports",
+            "description": "CarDamageReports"
+        },
         {
             "name": "Feature Flags",
             "description": "Feature Flags"

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\FeatureFlags\Web;
+namespace App\FeatureFlags\Controllers;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class FeatureFlagRequest extends FormRequest
+class FeatureFlagWebRequest extends FormRequest
 {
     public function authorize(): bool
     {
